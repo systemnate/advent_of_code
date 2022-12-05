@@ -1,4 +1,3 @@
-require 'pry'
 # reads modified input (just the crates)
 input = open('input.txt')
   .read.split("\n")
