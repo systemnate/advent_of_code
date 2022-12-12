@@ -2,7 +2,7 @@ require 'pry'
 require 'pry-byebug'
 
 parsed_monkeys = {}
-monkeys = open('sample.txt')
+monkeys = open('input.txt')
             .read
             .split("\n\n")
             .map { |monkey| monkey.split("\n") }
