@@ -23,10 +23,10 @@ monkeys.each do |monkey|
   parsed_monkeys[monkey_number][:count] = 0
 end
 
-20.times do
+20.times do |n|
   monkeys.size.times do |i|
     monkey = parsed_monkeys[i]
-    until monkey[:starting_items]&.empty?
+    until monkey[:starting_items].empty?
       monkey[:count] += 1
       old = monkey[:starting_items].shift
       new = eval(monkey[:operation]) / 3
