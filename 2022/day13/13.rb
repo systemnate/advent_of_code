@@ -39,3 +39,17 @@ input.each_with_index  do |row, index|
 end
 
 puts total
+
+input2 = open('input.txt')
+           .read
+           .split("\n")
+           .reject(&:empty?)
+           .map { |row| eval(row) }
+           .push([[2]])
+           .push([[6]])
+           .sort { |left, right| deep_compare(left, right) ? -1 : 1 }
+
+divider_packet_1 = input2.find_index([[2]]) + 1
+divider_packet_2 = input2.find_index([[6]]) + 1
+
+puts divider_packet_1 * divider_packet_2
