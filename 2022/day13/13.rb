@@ -38,6 +38,14 @@ input.each_with_index  do |row, index|
   end
 end
 
+def dfs(graph, start, visited = Set.new)
+  visited << start
+  graph[start].each do |node|
+    dfs(graph, node, visited) unless visited.include?(node)
+  end
+  visited
+end
+
 puts total
 
 input2 = open('input.txt')
