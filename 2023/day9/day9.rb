@@ -16,8 +16,7 @@ end
 
 # process each line in the input until all items are 0
 # store the "new value" in the result
-result = []
-data.each do |line|
+result = data.each_with_object([]) do |line, result|
   temp = []
   until line.all?(&:zero?)
     line = reduce_line(line)
@@ -26,15 +25,14 @@ data.each do |line|
   result << temp
 end
 
-# sum all results as this is what we need to add to the initial array
+
+# sum each result since this is what we need to add to the initial data
 result.map!(&:sum)
 
-# combine result with initial data and add the last 2 elements together
-data = data.zip(result).map { |(a,b)| a << b }
-
-data = data.each_with_object([]) do |line, arr|
-  arr << line[0...-2].append(line.last(2).sum)
+# create a new array that contains the last element in the initial data
+# plus the sum from reducing each line
+answer = data.each_with_object([]).with_index do |(line,arr), index|
+  arr << line.last + result[index]
 end
 
-# get the last value in each line and sum together
-p data.map(&:last).sum
+p answer.sum
