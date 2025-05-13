@@ -34,6 +34,33 @@ data.each do |dir|
 end
 
 puts light_grid.sum { |row| row.count(true) }
+
+# part 2
+
+light_grid = Array.new(1_000) { Array.new(1_000, 0) }
+
+def set_lights_part_two(array, top_left, bottom_right, command)
+  row_start, col_start = top_left
+  row_end, col_end = bottom_right
+
+  (row_start..row_end).each do |row|
+    (col_start..col_end).each do |col|
+      if command == "toggle"
+        array[row][col] += 2
+      elsif command == "on"
+        array[row][col] += 1
+      elsif command == "off"
+        array[row][col] = [array[row][col] - 1, 0].max
+      end
+    end
+  end
+end
+
+data.each do |dir|
+  set_lights_part_two(light_grid, dir.start_coord, dir.end_coord, dir.command)
+end
+
+puts light_grid.map(&:sum).sum
 __END__
 turn off 660,55 through 986,197
 turn off 341,304 through 638,850
