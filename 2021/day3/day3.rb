@@ -1,11 +1,27 @@
 require "debug"
 
-data = DATA.readlines.map(&:chomp).map(&:chars).transpose
+o_data = DATA.readlines.map(&:chomp).map(&:chars)
+t_data = o_data.transpose
 
-gamma =   data.map { _1.tally.max_by { |_, v| v } }.map(&:first).join.to_i(2)
-epsilon = data.map { _1.tally.min_by { |_, v| v } }.map(&:first).join.to_i(2)
+gamma =   t_data.map { _1.tally.max_by { |_, v| v } }.map(&:first).join.to_i(2)
+epsilon = t_data.map { _1.tally.min_by { |_, v| v } }.map(&:first).join.to_i(2)
 
 puts gamma * epsilon
+
+# part 2
+
+oxygen = o_data.dup
+co2 = o_data.dup
+
+t_data.count.times do |idx|
+  most_common = oxygen.map { |p| p[idx] }.tally.max_by { |k, v| [v, k] }.first
+  least_common = co2.map { |p| p[idx] }.tally.min_by { |k, v| [v, k] }.first
+
+  oxygen.select! { |p| p[idx] == most_common }
+  co2.select! { |p| p[idx] == least_common }
+end
+
+puts oxygen.map(&:join).first.to_i(2) * co2.map(&:join).first.to_i(2)
 __END__
 010101110000
 010011000110
