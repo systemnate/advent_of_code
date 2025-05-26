@@ -37,13 +37,68 @@ directions = [
 
       if matched
         count += 1
-        puts "Found XMAS at (#{r},#{c}) in direction [#{dr},#{dc}]"
       end
     end
   end
 end
 
 p count
+
+# part 2
+
+count = 0
+
+(0...rows).each do |row|
+  (0...cols).each do |col|
+
+    if data[row][col] == "M"
+      if data[row][col + 2] == "S"
+        if data[row + 1]&.dig(col + 1) == "A"
+          if data[row + 2]&.dig(col) == "M"
+            if data[row + 2]&.dig(col + 2) == "S"
+              count += 1
+            end
+          end
+        end
+      end
+    end
+    if data[row][col] == "S"
+      if data[row][col + 2] == "S"
+        if data[row + 1]&.dig(col + 1) == "A"
+          if data[row + 2]&.dig(col) == "M"
+            if data[row + 2]&.dig(col + 2) == "M"
+              count += 1
+            end
+          end
+        end
+      end
+    end
+    if data[row][col] == "S" # top left
+      if data[row][col + 2] == "M" # top right
+        if data[row + 1]&.dig(col + 1) == "A" # middle
+          if data[row + 2]&.dig(col) == "S" # bottom left
+            if data[row + 2][col + 2] == "M" # bottom right
+              count += 1
+            end
+          end
+        end
+      end
+    end
+    if data[row][col] == "M" # top left
+      if data[row][col + 2] == "M" # top right
+        if data[row + 1]&.dig(col + 1) == "A" # middle
+          if data[row + 2]&.dig(col) == "S" # bottom left
+            if data[row + 2]&.dig(col + 2) == "S" # bottom right
+              count += 1
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+puts count
 
 __END__
 XMSSMSSMXSXSAMMMAMMMASAMXSSMAMSSSMMXSMMSSSMSAXAAMMMSMSMSMAMMMMXMMMMXAMXXMMMSMMMAMXMMSASMSSSMSMMMXMSSMSMSXMMXXMASXMMMMMMMXMASXAMSXSXSXSMAMSXS
