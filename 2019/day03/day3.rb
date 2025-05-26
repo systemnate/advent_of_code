@@ -11,69 +11,107 @@ wire2_position = central_port
 wire1_visited = Set.new
 wire2_visited = Set.new
 
-wire1.each do |command|
-  parts = command.split("")
+def traverse(directions, wire_position, visited)
+  directions.each do |command|
+    parts = command.split("")
 
-  case parts
-  in ["R", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire1_position += Complex(0, 1)
-      wire1_visited << wire1_position
-    end
-  in ["L", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire1_position -= Complex(0, 1)
-      wire1_visited << wire1_position
-    end
-  in ["U", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire1_position += Complex(1, 0)
-      wire1_visited << wire1_position
-    end
-  in ["D", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire1_position -= Complex(1, 0)
-      wire1_visited << wire1_position
+    case parts
+    in ["R", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        wire_position += Complex(0, 1)
+        visited << wire_position
+      end
+    in ["L", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        wire_position -= Complex(0, 1)
+        visited << wire_position
+      end
+    in ["U", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        wire_position += Complex(1, 0)
+        visited << wire_position
+      end
+    in ["D", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        wire_position -= Complex(1, 0)
+        visited << wire_position
+      end
     end
   end
 end
 
-wire2.each do |command|
-  parts = command.split("")
+traverse(wire1, wire1_position, wire1_visited)
+traverse(wire2, wire2_position, wire2_visited)
 
-  case parts
-  in ["R", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire2_position += Complex(0, 1)
-      wire2_visited << wire2_position
+intersections = wire1_visited & wire2_visited
+puts intersections.map(&:rect).map { |(x, y)| x.abs + y.abs }.min
+
+# part 2
+
+def steps(directions, target)
+  num_steps = 0
+  wire_position = Complex(0, 0)
+
+  directions.each do |command|
+    parts = command.split("")
+
+    case parts
+    in ["R", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        num_steps += 1
+        wire_position += Complex(0, 1)
+        if wire_position == target
+          return num_steps
+        end
+      end
+    in ["L", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        num_steps += 1
+        wire_position -= Complex(0, 1)
+        if wire_position == target
+          return num_steps
+        end
+      end
+    in ["U", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        num_steps += 1
+        wire_position += Complex(1, 0)
+        if wire_position == target
+          return num_steps
+        end
+      end
+    in ["D", *amount]
+      amount = amount.join.to_i
+      amount.times do
+        num_steps += 1
+        wire_position -= Complex(1, 0)
+        if wire_position == target
+          return num_steps
+        end
+      end
     end
-  in ["L", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire2_position -= Complex(0, 1)
-      wire2_visited << wire2_position
-    end
-  in ["U", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire2_position += Complex(1, 0)
-      wire2_visited << wire2_position
-    end
-  in ["D", *amount]
-    amount = amount.join.to_i
-    amount.times do
-      wire2_position -= Complex(1, 0)
-      wire2_visited << wire2_position
-    end
+  end
+  num_steps
+end
+
+result = intersections.each_with_object({}) do |coord, hash|
+  [wire1, wire2].each_with_index do |directions, index|
+    number_of_steps = steps(directions,coord)
+
+    hash[index+1] ||= {}
+    hash[index+1][coord] = number_of_steps
   end
 end
 
-puts (wire1_visited & wire2_visited).map(&:rect).map { |(x, y)| x.abs + y.abs }.min
+result = result[1].merge(result[2]) { |k, v1, v2| v1 + v2 }
+puts result.min_by { |k, v| v }.last
 
 __END__
 R998,U502,R895,D288,R416,U107,R492,U303,R719,D601,R783,D154,L236,U913,R833,D329,R28,D759,L270,D549,L245,U653,L851,U676,L211,D949,R980,U314,L897,U764,R149,D214,L195,D907,R534,D446,R362,D6,L246,D851,L25,U925,L334,U673,L998,U581,R783,U912,R53,D694,L441,U411,L908,D756,R946,D522,L77,U468,R816,D555,L194,D707,R97,D622,R99,D265,L590,U573,R132,D183,L969,D207,L90,D331,R88,D606,L315,U343,R546,U460,L826,D427,L232,U117,R125,U309,R433,D53,R148,U116,L437,U339,L288,D879,L52,D630,R201,D517,L341,U178,R94,U636,L759,D598,L278,U332,R192,U463,L325,U850,L200,U810,L686,U249,L226,D297,R915,D117,R56,D59,R760,U445,R184,U918,R173,D903,R212,D868,L88,D798,L829,U835,L563,U19,R480,D989,R529,D834,R515,U964,L876,D294,R778,D551,L457,D458,R150,D698,R956,D781,L310,D948,R50,U56,R98,U348,L254,U614,L654,D359,R632,D994,L701,D615,R64,D507,R668,D583,L687,D902,L564,D214,R930,D331,L212,U943,R559,U886,R590,D805,R426,U669,L141,D233,L573,D682,L931,U267,R117,D900,L944,U667,L838,D374,L406,U856,R987,D870,R716,D593,R596,D654,R653,U120,L666,U145,R490,D629,R172,D881,L808,D324,R956,D532,L475,U165,L503,U361,R208,U323,R568,D876,R663,D11,L839,D67,R499,U75,L643,U954,R94,D418,R761,D842,L213,D616,L785,D42,R707,D343,L513,D480,L531,D890,L899,D2,L30,D188,R32,U588,R480,U33,R849,U443,L666,U117,L13,D974,L453,U93,R960,D369,R332,D61,L17,U557,R818,D744,L124,U916,L454,D572,R451,D29,R711,D134,R481,U366,L327,U132,L819,U839,R485,U941,R224,U531,R688,U561,R958,D899,L315,U824,L408,D941,R517,D163,L878,U28,R767,D798,R227
