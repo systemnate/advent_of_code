@@ -4,19 +4,64 @@ require "debug"
 
 pages, update = DATA.read.chomp.split("\n\n")
 pages = pages.split("\n").map { |page| page.split("|").map(&:to_i) }
-update = update.split("\n").map { |up| up.split(",") }
-update = update.map { |up| up.map(&:to_i) }
 
-results = update.each_with_object([]) do |up, array|
-  valid = true
+update = update.split("\n")
+update = update.map { _1.split(",").map(&:to_i) }
 
-  up.each_cons(2) do |a, b|
-    valid = false if pages.none? { |page| page == [a, b] }
-  end
-  array << up if valid
+dependencies = pages.each_with_object(Hash.new { |k, v| k[v] = [] }) do |(left, right), hash|
+  hash[left] << right
 end
 
-puts results.map { |arr| arr[arr.size / 2] }.sum
+result = update.each_with_object([]) do |test, array|
+  valid = true
+  test.each_cons(2) do |a, b|
+    unless dependencies[a].include?(b)
+      valid = false
+    end
+  end
+  array << test[test.length / 2] if valid
+end
+
+puts result.sum
+
+# part 2
+
+def topological_sort(pages_to_sort, dependencies)
+  in_degree = pages_to_sort.to_h { |k| [k, 0] }
+
+  pages_to_sort.each do |from|
+    dependencies[from].each do |to|
+      next unless pages_to_sort.include?(to)
+
+      in_degree[to] += 1
+    end
+  end
+
+  result = []
+  queue = in_degree.select { |_, v| v.zero? }.keys
+
+  until queue.empty?
+    node = queue.shift
+    result << node
+
+    dependencies[node].each do |neighbor|
+      next unless pages_to_sort.include?(neighbor)
+      in_degree[neighbor] -= 1
+
+      queue << neighbor if in_degree[neighbor].zero?
+    end
+    queue.sort!
+  end
+
+  result
+end
+
+invalid_pages = update.each_with_object([]) do |list_of_pages, results|
+  result = topological_sort(list_of_pages, dependencies)
+  results << result if result != list_of_pages
+end
+
+puts invalid_pages.map { |page| page[page.length / 2] }.sum
 __END__
 48|74
 95|99
