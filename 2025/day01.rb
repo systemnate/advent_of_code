@@ -6,59 +6,51 @@ require "debug"
 raw = AOC::Input.resolve(ARGV, DATA)
 instructions = AOC::Parser.lines(raw)
 
-class Safe
-  attr_reader :current, :range, :zero_counter
-
-  def initialize(starting_point = 50)
-    @current = starting_point
-    @range = (0..99).to_a
-    @zero_counter = 0
+class PartOneRotator
+  def rotate_left(safe, amount)
+    safe.current = safe.range[(safe.current - amount) % safe.range.size]
+    safe.zero_counter += 1 if safe.current.zero?
   end
 
-  def rotate_left(amount)
-    @current = @range[(@current - amount) % @range.size]
+  def rotate_right(safe, amount)
+    safe.current = safe.range[(safe.current + amount) % safe.range.size]
+    safe.zero_counter += 1 if safe.current.zero?
+  end
+end
 
-    if @current.zero?
-      @zero_counter += 1
+class PartTwoRotator
+  def rotate_left(safe, amount)
+    amount.times do
+      safe.current = safe.range[(safe.current - 1) % safe.range.size]
+      safe.zero_counter += 1 if safe.current.zero?
     end
   end
 
-  def rotate_right(amount)
-    @current = @range[(@current + amount) % @range.size]
-
-    if @current.zero?
-      @zero_counter += 1
+  def rotate_right(safe, amount)
+    amount.times do
+      safe.current = safe.range[(safe.current + 1) % safe.range.size]
+      safe.zero_counter += 1 if safe.current.zero?
     end
   end
 end
 
-class PartTwoSafe
-  attr_reader :current, :range, :zero_counter
+class Safe
+  attr_accessor :current, :zero_counter
+  attr_reader :range, :rotator
 
-  def initialize(starting_point = 50)
+  def initialize(starting_point = 50, rotator: PartOneRotator.new)
     @current = starting_point
     @range = (0..99).to_a
     @zero_counter = 0
+    @rotator = rotator
   end
 
   def rotate_left(amount)
-    amount.times do
-      @current = @range[(@current - 1) % @range.size]
-
-      if @current.zero?
-        @zero_counter += 1
-      end
-    end
+    rotator.rotate_left(self, amount)
   end
 
   def rotate_right(amount)
-    amount.times do
-      @current = @range[(@current + 1) % @range.size]
-
-      if @current.zero?
-        @zero_counter += 1
-      end
-    end
+    rotator.rotate_right(self, amount)
   end
 end
 
@@ -77,7 +69,7 @@ end
 
 puts safe.zero_counter
 
-safe = PartTwoSafe.new(50)
+safe = Safe.new(50, rotator: PartTwoRotator.new)
 
 instructions.each do |instruction|
   dir = instruction[0]
