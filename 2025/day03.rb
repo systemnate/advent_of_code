@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-require "debug"
 require_relative "../utils.rb"
 
+# some custom logic I made to either read
+# from the sample input or download the input
+# from the website
 raw = AOC::Input.resolve(ARGV, DATA)
-data = AOC::Parser.line_chars(raw)
-data = data.map { _1.map(&:to_i) }
+data = AOC::Parser.line_numbers(raw)
 
 class BatteryBank
   attr_reader :banks
@@ -14,14 +15,34 @@ class BatteryBank
     @banks = banks
   end
 
+  # first attempt, brute force
   def joltage
     banks.combination(2).max.map(&:to_s).join.to_i
+  end
+
+  # second attempt, monotonic stack
+  def joltage_fast(n = 12)
+    number_to_remove = banks.length - n
+
+    banks.each_with_object([]) do |digit, stack|
+      while number_to_remove > 0 && !stack.empty? && stack.last < digit
+        stack.pop
+
+        number_to_remove -= 1
+      end
+
+      stack << digit
+    end.first(n).map(&:to_s).join.to_i
   end
 end
 
 # part 1
 part_one = data.map { |banks| BatteryBank.new(banks).joltage }
 puts part_one.sum
+
+# part 2
+part_two = data.map { |banks| BatteryBank.new(banks).joltage_fast }
+puts part_two.sum
 
 __END__
 987654321111111

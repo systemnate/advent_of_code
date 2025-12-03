@@ -83,7 +83,8 @@ module AOC
 
     def self.line_numbers(data)
       io = _io(data)
-      io.readlines(chomp: true).map { |line| line.split.map(&:to_i) }
+      io = io.readlines(chomp: true).map(&:chars)
+      io.map { _1.map(&:to_i) }
     end
   end
 
