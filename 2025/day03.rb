@@ -16,8 +16,8 @@ class BatteryBank
   end
 
   # first attempt, brute force
-  def joltage
-    banks.combination(2).max.map(&:to_s).join.to_i
+  def joltage(n = 2)
+    banks.combination(n).max.join.to_i
   end
 
   # second attempt, monotonic stack
@@ -25,14 +25,13 @@ class BatteryBank
     number_to_remove = banks.length - n
 
     banks.each_with_object([]) do |digit, stack|
-      while number_to_remove > 0 && !stack.empty? && stack.last < digit
+      while number_to_remove.positive? && stack.any? && stack.last < digit
         stack.pop
-
         number_to_remove -= 1
       end
 
       stack << digit
-    end.first(n).map(&:to_s).join.to_i
+    end.first(n).join.to_i
   end
 end
 
