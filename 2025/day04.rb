@@ -24,13 +24,12 @@ class Grid
 
         count = 0
         AOC::DIRECTIONS.each do |dy, dx|
-          if in_bounds?(rix + dy, cix + dx)
-            if grid[rix + dy][cix + dx] == "@"
-              count += 1
-            end
-          end
+          next unless in_bounds?(rix + dy, cix + dx)
+
+          count += 1 if grid[rix + dy][cix + dx] == "@"
         end
-        paper_count = paper_count + 1 if count < 4
+
+        paper_count += 1 if count < 4
       end
     end
 
@@ -47,19 +46,18 @@ class Grid
           next unless col == "@"
 
           count = 0
+
           AOC::DIRECTIONS.each do |dy, dx|
-            if in_bounds?(rix + dy, cix + dx)
-              if grid[rix + dy][cix + dx] == "@"
-                count += 1
-              end
-            end
+            next unless in_bounds?(rix + dy, cix + dx)
+
+            count += 1 if grid[rix + dy][cix + dx] == "@"
           end
 
-          if count < 4
-            paper_count = paper_count + 1
-            grid[rix][cix] = "."
-            paper_removed += 1
-          end
+          next unless count < 4
+
+          paper_count += 1
+          grid[rix][cix] = "."
+          paper_removed += 1
         end
       end
 
