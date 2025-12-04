@@ -36,14 +36,14 @@ end
 # part 1
 invalid_numbers = data.each_with_object([]) do |range, invalids|
   invalids << range.select { |n| Product.new(n).invalid? }
-end.flatten.compact
+end.flatten
 
 puts invalid_numbers.sum
 
 # part 2
 invalid_numbers = data.each_with_object([]) do |range, invalids|
   invalids << range.select { |n| Product.new(n).really_invalid? }
-end.flatten.compact
+end.flatten
 
 puts invalid_numbers.sum
 
