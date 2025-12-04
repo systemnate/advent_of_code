@@ -10,19 +10,23 @@ data = data.split(",")
            .map { |first, last| (first.to_i..last.to_i) }
 
 class Product
-  def self.invalid?(product_id)
-    product_id = product_id.to_s
-    middle_point = product_id.length / 2
-    product_id.chars[0...middle_point] == product_id.chars[middle_point..]
+  attr_reader :product_id, :product_length, :middle_point
+
+  def initialize(product_id)
+    @product_id = product_id.to_s
+    @product_length = @product_id.length
+    @middle_point = @product_length / 2
   end
 
-  def self.really_invalid?(product_id)
-    product_id = product_id.to_s
+  def invalid?
+    product_id[0...middle_point] == product_id[middle_point..]
+  end
 
-    (1..product_id.length / 2).each do |length|
-      pattern = product_id[0...length]
+  def really_invalid?
+    (1..middle_point).each do |pattern_length|
+      pattern = product_id[0...pattern_length]
 
-      return true if pattern * (product_id.length / length) == product_id
+      return true if pattern * (product_length / pattern_length) == product_id
     end
 
     false
@@ -31,14 +35,14 @@ end
 
 # part 1
 invalid_numbers = data.each_with_object([]) do |range, invalids|
-  invalids << range.select { |n| Product.invalid?(n) }
+  invalids << range.select { |n| Product.new(n).invalid? }
 end.flatten.compact
 
 puts invalid_numbers.sum
 
 # part 2
 invalid_numbers = data.each_with_object([]) do |range, invalids|
-  invalids << range.select { |n| Product.really_invalid?(n) }
+  invalids << range.select { |n| Product.new(n).really_invalid? }
 end.flatten.compact
 
 puts invalid_numbers.sum
