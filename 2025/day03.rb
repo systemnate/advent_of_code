@@ -9,20 +9,15 @@ raw = AOC::Input.resolve(ARGV, DATA)
 data = AOC::Parser.line_numbers(raw)
 
 class BatteryBank
-  attr_reader :banks
+  attr_reader :banks, :digits
 
-  def initialize(banks)
+  def initialize(banks, digits = 2)
     @banks = banks
+    @digits = digits
   end
 
-  # first attempt, brute force
-  def joltage(n = 2)
-    banks.combination(n).max.join.to_i
-  end
-
-  # second attempt, monotonic stack
-  def joltage_fast(n = 12)
-    number_to_remove = banks.length - n
+  def joltage
+    number_to_remove = banks.length - digits
 
     banks.each_with_object([]) do |digit, stack|
       while number_to_remove.positive? && stack.any? && stack.last < digit
@@ -31,7 +26,7 @@ class BatteryBank
       end
 
       stack << digit
-    end.first(n).join.to_i
+    end.first(digits).join.to_i
   end
 end
 
@@ -40,7 +35,7 @@ part_one = data.map { |banks| BatteryBank.new(banks).joltage }
 puts part_one.sum
 
 # part 2
-part_two = data.map { |banks| BatteryBank.new(banks).joltage_fast }
+part_two = data.map { |banks| BatteryBank.new(banks, 12).joltage }
 puts part_two.sum
 
 __END__
