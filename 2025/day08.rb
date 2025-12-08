@@ -31,37 +31,49 @@ def all_edges(points)
   edges.sort_by!(&:dist)
 end
 
-# part 1
-
 edges = all_edges(points)
 
-boxes = [Set.new([edges.first.p1, edges.first.p2])]
+# part 1
+
 length = data.size > 20 ? 1_000 : 10
-edges[1...length].each do |edge|
+boxes = points.map { |p| Set.new([p]) }
+
+edges.first(length).each do |edge|
   p1, p2 = edge.p1, edge.p2
-  matching_boxes = boxes.select { |box| box.include?(p1) || box.include?(p2) }
 
-  case matching_boxes.size
-  when 0
-    boxes << Set.new([p1, p2])
-  when 1
-    box = matching_boxes.first
-    box << p1
-    box << p2
-  else
-    box = matching_boxes.first
+  box1 = boxes.find { |b| b.include?(p1) }
+  box2 = boxes.find { |b| b.include?(p2) }
 
-    matching_boxes[1..].each do |b|
-      box.merge(b)
-      boxes.delete(b)
-    end
+  next if box1.equal?(box2)
 
-    box << p1
-    box << p2
-  end
+  box1.merge(box2)
+  boxes.delete(box2)
 end
 
 puts boxes.map(&:size).max(3).reduce(&:*)
+
+# part 2
+boxes = points.map { |p| Set.new([p]) }
+
+last_edge = nil
+
+edges.each do |edge|
+  p1, p2 = edge.p1, edge.p2
+
+  box1 = boxes.find { |b| b.include?(p1) }
+  box2 = boxes.find { |b| b.include?(p2) }
+
+  next if box1.equal?(box2)
+
+  box1.merge(box2)
+  boxes.delete(box2)
+
+  last_edge = edge
+
+  break if boxes.size == 1
+end
+
+puts last_edge.p1.x * last_edge.p2.x
 
 __END__
 162,817,812
