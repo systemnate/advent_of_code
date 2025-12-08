@@ -3,10 +3,10 @@
 require "debug"
 require "httparty"
 require "stringio"
-require "dotenv/load"
+require "dotenv"
 require "active_support/core_ext/object/blank"
 
-Dotenv.load
+Dotenv.load(File.join(__dir__, ".env"))
 
 module AOC
   module Input
