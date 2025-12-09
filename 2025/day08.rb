@@ -4,6 +4,8 @@ require "debug"
 require_relative "../utils.rb"
 
 raw = AOC::Input.resolve(ARGV, DATA)
+
+# data = [ [1,2,3], [4,5,6], ... ]
 data = AOC::Parser.lines(raw).map { _1.split(",") }.map { _1.map(&:to_i) }
 
 Point = Struct.new(:x, :y, :z) do
@@ -18,23 +20,19 @@ Edge = Struct.new(:p1, :p2, :dist)
 
 points = data.map { Point.new(*_1) }
 
-def all_edges(points)
-  edges = []
+edges = []
 
-  points.each_with_index do |p1, i|
-    points[(i + 1)...points.length].each do |p2|
-      dist = p1.distance(p2)
-      edges << Edge.new(p1, p2, dist)
-    end
+# compute distance between all points
+points.each_with_index do |p1, i|
+  points[(i + 1)...points.length].each do |p2|
+    dist = p1.distance(p2)
+    edges << Edge.new(p1, p2, dist)
   end
-
-  edges.sort_by!(&:dist)
 end
 
-edges = all_edges(points)
+edges.sort_by!(&:dist)
 
 # part 1
-
 length = data.size > 20 ? 1_000 : 10
 boxes = points.map { |p| Set.new([p]) }
 
